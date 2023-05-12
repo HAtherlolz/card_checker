@@ -1,7 +1,9 @@
 # FastAPI SQLAlchemy async boilerplate
 
+## This boilerplate provides configured FastAPI application, SQLAlchemy orm async, alembic - migrations, sqladmin - customizable admin panel
+
 ## Setup
-1. Clone repo using `git clone https://github.com/.../`
+1. Clone repo using `git clone https://github.com/HAtherlolz/fastapi_sqlaclhemy_boilerplate.git`
 2. Install Python 3.11 +
 3. Install PostgreSQL 14 +
 4. Install virtualenv package for Python `pip install virtualenv`
@@ -59,8 +61,11 @@ You must fill the variables given for you by Team-Lead
 - The flag `--reload` allows you to automatically restart the server after the applied changes in the code
 - The flag `--port` allows you to change port.
 
-## 2.1 Run tests
-- docker-compose -f docker-compose.test.yml up --build --abort-on-container-exit
+## 2.1 Run migrations
+### Create a migrations file
+- alembic revision --autogenerate -m "name_of_your_migration"
+### Run last migrations
+- alembic upgrade head 
 
 
 ## Swagger url: 
