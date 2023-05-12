@@ -1,6 +1,4 @@
-# FastAPI SQLAlchemy async boilerplate
-
-## This boilerplate provides configured FastAPI application, SQLAlchemy orm async, alembic - migrations, sqladmin - customizable admin panel
+# Card Checker
 
 ## Setup
 1. Clone repo using `git clone https://github.com/HAtherlolz/fastapi_sqlaclhemy_boilerplate.git`
