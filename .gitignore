@@ -7,6 +7,8 @@ assets/
 .env.nginx
 .env.test
 
+db/
+
 __pycache__/
 report.html
 
