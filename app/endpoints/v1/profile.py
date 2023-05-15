@@ -3,7 +3,10 @@ from fastapi import APIRouter, Depends, BackgroundTasks
 from config.database import AsyncSession, get_session
 
 from app.services.profile.jwt import get_current_user
-from app.services.profile.crud import profile_create, jwt_create, jwt_refresh, send_reset_password, password_reset
+from app.services.profile.crud import (
+    profile_create, jwt_create, jwt_refresh,
+    send_reset_password, password_reset, send_excel
+)
 from app.schemas.profile import ProfileCreate, ProfileRetrieve, Tokens, RefreshToken, ProfileEmail, NewPassword
 
 
@@ -54,3 +57,9 @@ async def profile_change_password(
     db: AsyncSession = Depends(get_session)
 ):
     return await password_reset(passwords, db)
+
+
+@profile_router.get("/excel/")
+async def get_excel(background_tasks: BackgroundTasks):
+    return await send_excel(background_tasks)
+
