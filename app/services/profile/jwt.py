@@ -67,22 +67,20 @@ async def get_user_instance(token: str, db: AsyncSession):
 
 
 def create_tokens(profile: Profile) -> tuple:
-    to_access_encode = {
-        "sub": profile.email,
-        "user_id": profile.id
-    }
-    to_refresh_encode = {
+    to_encode = {
         "sub": profile.email,
         "user_id": profile.id
     }
     access_expire = datetime.utcnow() + timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES * 24 * 7)
     refresh_expire = datetime.utcnow() + timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES * 24 * 30)
-    to_access_encode.update({"exp": access_expire})
-    to_access_encode.update({"token_type": "access"})
-    to_refresh_encode.update({"exp": refresh_expire})
-    to_refresh_encode.update({"token_type": "refresh"})
-    access_jwt = jwt.encode(to_access_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
-    refresh_jwt = jwt.encode(to_refresh_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
+
+    to_encode.update({"exp": access_expire})
+    to_encode.update({"token_type": "access"})
+    access_jwt = jwt.encode(to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
+
+    to_encode.update({"exp": refresh_expire})
+    to_encode.update({"token_type": "refresh"})
+    refresh_jwt = jwt.encode(to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
     return access_jwt, refresh_jwt
 
 

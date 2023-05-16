@@ -8,6 +8,8 @@ from app.services.profile.jwt import (
     get_password_hash, create_tokens, authenticate_user,
     get_current_user_by_refresh_token, get_current_user
 )
+from app.services.excel.excel import get_excel_file
+from app.services.excel.send_email import send_excel_email
 from app.services.profile.send_email import send_password_email
 from app.services.queries.profile_queries import (
     check_profile_exists_by_email, create_profile_instance, update_profile_password
@@ -82,5 +84,10 @@ async def password_reset(
     profile = await get_current_user(passwords.token)
     if isinstance(profile, bool):
         raise HTTPException(status_code=400, detail="Invalid token")
-    hashed_password = get_password_hash(profile.password)
+    hashed_password = get_password_hash(passwords.password)
     return await update_profile_password(profile.id, hashed_password, db)
+
+
+async def send_excel(background_tasks: BackgroundTasks) -> None:
+    file = await get_excel_file()
+    background_tasks.add_task(send_excel_email, email_to="kirill.syusko17@gmail.com", file=file)
