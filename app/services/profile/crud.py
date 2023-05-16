@@ -66,7 +66,7 @@ async def send_reset_password(
 ) -> HTTPException | dict:
     profile_check = await check_profile_exists_by_email(email.email, db)
     if not profile_check:
-        raise HTTPException(status_code=400, detail="Profile with this email is already exist")
+        raise HTTPException(status_code=400, detail="Profile with this email does not exist")
     access_token, _ = create_tokens(profile_check)
     background_tasks.add_task(send_password_email, email.email, access_token)
     return {"message": "The email for with link to reset password successfully send"}
