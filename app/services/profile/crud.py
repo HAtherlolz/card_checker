@@ -84,7 +84,7 @@ async def password_reset(
     profile = await get_current_user(passwords.token)
     if isinstance(profile, bool):
         raise HTTPException(status_code=400, detail="Invalid token")
-    hashed_password = get_password_hash(profile.password)
+    hashed_password = get_password_hash(passwords.password)
     return await update_profile_password(profile.id, hashed_password, db)
 
 
