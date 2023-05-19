@@ -74,7 +74,6 @@ async def get_excel(background_tasks: BackgroundTasks):
     return await send_excel(background_tasks)
 
 
-@profile_router.post("/webhook/")
+@profile_router.post("/webhook/", response_model=Webhook)
 async def webhook(hook: Webhook):
-    print(hook.dict())
-    return 1
+    return hook
