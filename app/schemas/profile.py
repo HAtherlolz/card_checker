@@ -20,7 +20,11 @@ class ProfileCreate(BaseModel):
     """ Create Profile schema """
     email: EmailStr
     password: str
-    guid: str | None
+
+
+class ProfileCreateWithGUID(ProfileCreate):
+    """ Create profile with guid """
+    guid: str
 
 
 class NewPassword(BaseModel):

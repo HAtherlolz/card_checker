@@ -3,7 +3,7 @@ from fastapi import HTTPException, status, BackgroundTasks
 from config.database import AsyncSession
 
 from app.models import Profile
-from app.schemas.profile import ProfileCreate, Tokens, RefreshToken, ProfileEmail, NewPassword
+from app.schemas.profile import ProfileCreate, Tokens, RefreshToken, ProfileEmail, NewPassword, ProfileCreateWithGUID
 from app.services.profile.jwt import (
     get_password_hash, create_tokens, authenticate_user,
     get_current_user_by_refresh_token, get_current_user
@@ -24,9 +24,12 @@ async def profile_create(
     profile_check = await check_profile_exists_by_email(profile.email, db)
     if profile_check:
         raise HTTPException(status_code=400, detail="Profile with this email is already exist")
-    profile.password = get_password_hash(profile.password)
-    profile.guid = await register_user(profile.email)
-    profile_instance = await create_profile_instance(profile, db)
+    hashed_password = get_password_hash(profile.password)
+    guid = await register_user(profile.email)
+
+    profile_with_guid = ProfileCreateWithGUID(email=profile.email, password=hashed_password, guid=guid)
+
+    profile_instance = await create_profile_instance(profile_with_guid, db)
     access_token, refresh_token = create_tokens(profile_instance)
     return Tokens(access_token=access_token, refresh_token=refresh_token)
 

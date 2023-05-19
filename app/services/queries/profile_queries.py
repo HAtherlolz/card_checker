@@ -3,7 +3,7 @@ from sqlalchemy import select, update
 from config.database import AsyncSession
 
 from app.models import Profile
-from app.schemas.profile import ProfileCreate
+from app.schemas.profile import ProfileCreateWithGUID
 
 
 async def check_profile_exists_by_email(
@@ -17,7 +17,7 @@ async def check_profile_exists_by_email(
 
 
 async def create_profile_instance(
-        profile: ProfileCreate,
+        profile: ProfileCreateWithGUID,
         db: AsyncSession
 ) -> Profile:
     new_profile = Profile(**profile.dict())
