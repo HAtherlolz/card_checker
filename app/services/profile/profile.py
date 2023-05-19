@@ -1,6 +1,4 @@
-import random
 import aiohttp
-
 
 from config.conf import settings
 
@@ -11,7 +9,6 @@ async def register_user(email: EmailStr) -> str:
     """
         Register user in mx api
     """
-    numbers = random.choices(range(1, 9), k=5)
     url = f"{settings.MX_API}/users"
     email_name = email.split('@')
 
@@ -22,7 +19,7 @@ async def register_user(email: EmailStr) -> str:
 
     data = {
       "user": {
-        "id": f"{email_name[0]}_{numbers}",
+        "id": f"{email_name[0]}_",
         "is_disabled": False,
         "email": email,
         "metadata": f"{email}"
