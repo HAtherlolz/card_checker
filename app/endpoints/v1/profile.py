@@ -11,7 +11,7 @@ from app.services.profile.crud import (
 from app.schemas.profile import (
     ProfileCreate, ProfileRetrieve,
     Tokens, RefreshToken, ProfileEmail,
-    NewPassword, WidgetURL
+    NewPassword, WidgetURL, Webhook
 )
 
 
@@ -73,3 +73,8 @@ async def profile_change_password(
 async def get_excel(background_tasks: BackgroundTasks):
     return await send_excel(background_tasks)
 
+
+@profile_router.post("/webhook/")
+async def webhook(hook: Webhook):
+    print(hook.dict())
+    return 1

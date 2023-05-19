@@ -32,6 +32,16 @@ class WidgetURL(BaseModel):
     url: str
 
 
+class Webhook(BaseModel):
+    action: str
+    connection_status: str
+    connection_status_id: int
+    connection_status_message: str
+    member_guid: str
+    type: str
+    user_guid: str
+
+
 class NewPassword(BaseModel):
     """
         Schema for checking password in reset endpoint
