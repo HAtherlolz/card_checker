@@ -64,29 +64,38 @@ async def get_accounts(user_guid: str, member_guid: str) -> list:
         "Content-Type": "application/json",
         "Accept": "application/vnd.mx.api.v1+json"
     }
-    accounts_dict = dict()
+
     accounts_dicts_list = list()
     url = f"{settings.MX_API}/users/{user_guid}/members/{member_guid}/accounts?page=1&records_per_page=100"
     async with aiohttp.ClientSession() as session:
         auth = aiohttp.BasicAuth(login=settings.CLIENT_ID, password=settings.API_KEY)
         async with session.get(url=url, headers=headers, auth=auth) as response:
             res = await response.json()
+        print("===================================total_pages=================", res["pagination"]["total_pages"])
+        print("===================================current_page=================", res["pagination"]["current_page"])
+        print("===================================per_page=================", res["pagination"]["per_page"])
+        print("===================================total_entries=================", res["pagination"]["total_entries"])
         if res["pagination"]["total_pages"] > 1:
+            print("SMTHS")
             pages = res["pagination"]["total_pages"]
             for page in range(1, pages):
                 url = f"{settings.MX_API}/users/{user_guid}/members/{member_guid}/" \
-                      f"accounts?page={page}&records_per_page=10"
+                      f"accounts?page={page}&records_per_page=100"
                 async with session.get(url=url, headers=headers, auth=auth) as response:
                     res = await response.json()
-                    for account in res["accounts"]:
-                        accounts_dict["guid"] = account["guid"]
-                        accounts_dict["name"] = account["name"]
-                        accounts_dicts_list.append(accounts_dict)
+                    accounts_dicts_list = await write_accounts(res["accounts"], accounts_dicts_list)
         else:
-            for account in res["accounts"]:
-                accounts_dict["guid"] = account["guid"]
-                accounts_dict["name"] = account["name"]
-                accounts_dicts_list.append(accounts_dict)
+            print("SMTHS123")
+            accounts_dicts_list = await write_accounts(res["accounts"], accounts_dicts_list)
+    return accounts_dicts_list
+
+
+async def write_accounts(accounts: dict, accounts_dicts_list: list) -> list:
+    for account in accounts:
+        accounts_dict = dict()
+        accounts_dict["guid"] = account["guid"]
+        accounts_dict["name"] = account["name"]
+        accounts_dicts_list.append(accounts_dict)
     return accounts_dicts_list
 
 
@@ -96,13 +105,13 @@ async def get_transactions(user_guid: str, accounts_list: list) -> dict:
         "Accept": "application/vnd.mx.api.v1+json"
     }
 
-    transactions_dict = defaultdict(int)
     transactions_by_account_dict = dict()
 
     # Gets dates range from now to 24 month back
     from_date, to_date = await get_dates()
 
     for account in accounts_list:
+        transactions_dict = defaultdict(int)
         transactions_dicts_list = list()
         # Getting account guid from list
         account_guid = account["guid"]
@@ -114,8 +123,13 @@ async def get_transactions(user_guid: str, accounts_list: list) -> dict:
             auth = aiohttp.BasicAuth(login=settings.CLIENT_ID, password=settings.API_KEY)
             async with session.get(url=url, headers=headers, auth=auth) as response:
                 res = await response.json()
+            print("===================================total_pages=================", res["pagination"]["total_pages"])
+            print("===================================current_page=================", res["pagination"]["current_page"])
+            print("===================================per_page=================", res["pagination"]["per_page"])
+            print("===================================total_entries=================", res["pagination"]["total_entries"])
             # If pages > 1, does requests from first to last page
             if res["pagination"]["total_pages"] > 1:
+                print("TUTA")
                 pages = res["pagination"]["total_pages"]
 
                 for page in range(1, pages):
@@ -124,12 +138,15 @@ async def get_transactions(user_guid: str, accounts_list: list) -> dict:
                     async with session.get(url=url, headers=headers, auth=auth) as response:
                         res = await response.json()
                         for transaction in res["transactions"]:
+                            print("=--=-==--==-=-=-===-==-=-=-=-=-=-=-=-==-=-==-=", transaction["amount"])
                             transactions_dict[transaction["category"]] += transaction["amount"]
-                            transactions_dicts_list.append(dict(transactions_dict))
+                            print("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++", transactions_dict)
+                transactions_dicts_list.append(dict(transactions_dict))
             else:
+                print("TUTA2")
                 for transaction in res["transactions"]:
                     transactions_dict[transaction["category"]] += transaction["amount"]
-                    transactions_dicts_list.append(dict(transactions_dict))
+                transactions_dicts_list.append(dict(transactions_dict))
         transactions_by_account_dict[account_name] = transactions_dicts_list
     return transactions_by_account_dict
 
