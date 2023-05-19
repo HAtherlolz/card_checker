@@ -30,3 +30,25 @@ async def register_user(email: EmailStr) -> str:
         async with session.post(url=url, json=data, headers=headers, auth=auth) as response:
             res = await response.json()
     return res["user"]["guid"]
+
+
+async def widget_url_by_guid(guid: str) -> str:
+    url = f"{settings.MX_API}/users/{guid}/widget_urls"
+
+    headers = {
+        "Content-Type": "application/json",
+        "Accept": "application/vnd.mx.api.v1+json"
+    }
+
+    data = {
+        "widget_url": {
+            "widget_type": "connect_widget",
+            "color_scheme": "dark"
+        }
+    }
+
+    async with aiohttp.ClientSession() as session:
+        auth = aiohttp.BasicAuth(login=settings.CLIENT_ID, password=settings.API_KEY)
+        async with session.post(url=url, json=data, headers=headers, auth=auth) as response:
+            res = await response.json()
+    return res["widget_url"]["url"]

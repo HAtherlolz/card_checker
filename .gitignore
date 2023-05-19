@@ -9,6 +9,8 @@ assets/
 
 db/
 
+test.py
+
 __pycache__/
 report.html
 

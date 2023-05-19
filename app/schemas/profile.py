@@ -27,6 +27,11 @@ class ProfileCreateWithGUID(ProfileCreate):
     guid: str
 
 
+class WidgetURL(BaseModel):
+    """ Schema for getting url """
+    url: str
+
+
 class NewPassword(BaseModel):
     """
         Schema for checking password in reset endpoint

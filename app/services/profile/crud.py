@@ -3,7 +3,11 @@ from fastapi import HTTPException, status, BackgroundTasks
 from config.database import AsyncSession
 
 from app.models import Profile
-from app.schemas.profile import ProfileCreate, Tokens, RefreshToken, ProfileEmail, NewPassword, ProfileCreateWithGUID
+from app.schemas.profile import (
+    ProfileCreate, Tokens, RefreshToken,
+    ProfileEmail, NewPassword, ProfileCreateWithGUID,
+    ProfileRetrieve
+)
 from app.services.profile.jwt import (
     get_password_hash, create_tokens, authenticate_user,
     get_current_user_by_refresh_token, get_current_user
@@ -14,7 +18,7 @@ from app.services.profile.send_email import send_password_email
 from app.services.queries.profile_queries import (
     check_profile_exists_by_email, create_profile_instance, update_profile_password
 )
-from app.services.profile.profile import register_user
+from app.services.profile.profile import register_user, widget_url_by_guid
 
 
 async def profile_create(
@@ -96,3 +100,11 @@ async def password_reset(
 async def send_excel(background_tasks: BackgroundTasks) -> None:
     file = await get_excel_file()
     background_tasks.add_task(send_excel_email, email_to="kirill.syusko17@gmail.com", file=file)
+
+
+async def get_widget_url(profile: ProfileRetrieve):
+    url = await widget_url_by_guid(profile.guid)
+    res = {
+        "url": url
+    }
+    return res

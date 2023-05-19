@@ -5,9 +5,14 @@ from config.database import AsyncSession, get_session
 from app.services.profile.jwt import get_current_user
 from app.services.profile.crud import (
     profile_create, jwt_create, jwt_refresh,
-    send_reset_password, password_reset, send_excel
+    send_reset_password, password_reset, send_excel,
+    get_widget_url
 )
-from app.schemas.profile import ProfileCreate, ProfileRetrieve, Tokens, RefreshToken, ProfileEmail, NewPassword
+from app.schemas.profile import (
+    ProfileCreate, ProfileRetrieve,
+    Tokens, RefreshToken, ProfileEmail,
+    NewPassword, WidgetURL
+)
 
 
 profile_router = APIRouter()
@@ -40,6 +45,11 @@ async def refresh_jwt(
 @profile_router.get("/me/", response_model=ProfileRetrieve, status_code=200)
 async def me(profile: ProfileRetrieve = Depends(get_current_user)):
     return profile
+
+
+@profile_router.get("/profile/widget-url/", response_model=WidgetURL)
+async def get_url(profile: ProfileRetrieve = Depends(get_current_user)):
+    return await get_widget_url(profile)
 
 
 @profile_router.post("/profile/send-reset-email/")
