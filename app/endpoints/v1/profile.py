@@ -12,7 +12,7 @@ from app.schemas.profile import (
     ProfileCreate, ProfileRetrieve,
     Tokens, RefreshToken, ProfileEmail,
     NewPassword, WidgetURL, Webhook,
-    Member
+    MxUserMemberGuids
 )
 
 
@@ -82,7 +82,6 @@ async def webhook(hook: Webhook):
 
 @profile_router.post("/hook/members/")
 async def cards_analyzer(
-        member: Member,
-        profile: ProfileRetrieve = Depends(get_current_user)
+        user_member_guids: MxUserMemberGuids,
 ):
-    return await get_card_analysis(member, profile)
+    return await get_card_analysis(user_member_guids)

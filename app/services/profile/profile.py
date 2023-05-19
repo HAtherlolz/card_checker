@@ -1,5 +1,10 @@
 import aiohttp
 
+from datetime import datetime
+from dateutil.relativedelta import relativedelta
+
+from collections import defaultdict
+
 from config.conf import settings
 
 from pydantic import EmailStr
@@ -69,7 +74,8 @@ async def get_accounts(user_guid: str, member_guid: str) -> list:
         if res["pagination"]["total_pages"] > 1:
             pages = res["pagination"]["total_pages"]
             for page in range(1, pages):
-                url = f"{settings.MX_API}/users/{user_guid}/members/{member_guid}/accounts?page={page}&records_per_page=10"
+                url = f"{settings.MX_API}/users/{user_guid}/members/{member_guid}/" \
+                      f"accounts?page={page}&records_per_page=10"
                 async with session.get(url=url, headers=headers, auth=auth) as response:
                     res = await response.json()
                     for account in res["accounts"]:
@@ -84,5 +90,52 @@ async def get_accounts(user_guid: str, member_guid: str) -> list:
     return accounts_dicts_list
 
 
+async def get_transactions(user_guid: str, accounts_list: list) -> dict:
+    headers = {
+        "Content-Type": "application/json",
+        "Accept": "application/vnd.mx.api.v1+json"
+    }
+
+    transactions_dict = defaultdict(int)
+    transactions_by_account_dict = dict()
+
+    # Gets dates range from now to 24 month back
+    from_date, to_date = await get_dates()
+
+    for account in accounts_list:
+        transactions_dicts_list = list()
+        # Getting account guid from list
+        account_guid = account["guid"]
+        account_name = account["name"]
+        # Getting check request to check amount of pages
+        url = f"{settings.MX_API}/users/{user_guid}/accounts/{account_guid}/" \
+              f"transactions?from_date={from_date}&to_date={to_date}&page=1&records_per_page=100"
+        async with aiohttp.ClientSession() as session:
+            auth = aiohttp.BasicAuth(login=settings.CLIENT_ID, password=settings.API_KEY)
+            async with session.get(url=url, headers=headers, auth=auth) as response:
+                res = await response.json()
+            # If pages > 1, does requests from first to last page
+            if res["pagination"]["total_pages"] > 1:
+                pages = res["pagination"]["total_pages"]
+
+                for page in range(1, pages):
+                    url = f"{settings.MX_API}/users/{user_guid}/accounts/{account_guid}/" \
+                          f"transactions?from_date={from_date}&to_date={to_date}&page={page}&records_per_page=100"
+                    async with session.get(url=url, headers=headers, auth=auth) as response:
+                        res = await response.json()
+                        for transaction in res["transactions"]:
+                            transactions_dict[transaction["category"]] += transaction["amount"]
+                            transactions_dicts_list.append(dict(transactions_dict))
+            else:
+                for transaction in res["transactions"]:
+                    transactions_dict[transaction["category"]] += transaction["amount"]
+                    transactions_dicts_list.append(dict(transactions_dict))
+        transactions_by_account_dict[account_name] = transactions_dicts_list
+    return transactions_by_account_dict
 
 
+async def get_dates() -> tuple[str, str]:
+    """ Gets dates range from now to 24 month back """
+    date_to = datetime.now()
+    from_to = datetime.now() - relativedelta(months=24)
+    return str(from_to)[:10], str(date_to)[:10]

@@ -44,8 +44,9 @@ class Webhook(BaseModel):
     user_guid: Any | None
 
 
-class Member(BaseModel):
+class MxUserMemberGuids(BaseModel):
     """ Schema for getting member_guid """
+    user_guid: str
     member_guid: str
 
 

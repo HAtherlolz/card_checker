@@ -6,7 +6,7 @@ from app.models import Profile
 from app.schemas.profile import (
     ProfileCreate, Tokens, RefreshToken,
     ProfileEmail, NewPassword, ProfileCreateWithGUID,
-    ProfileRetrieve, Member
+    ProfileRetrieve, MxUserMemberGuids
 )
 from app.services.profile.jwt import (
     get_password_hash, create_tokens, authenticate_user,
@@ -18,7 +18,7 @@ from app.services.profile.send_email import send_password_email
 from app.services.queries.profile_queries import (
     check_profile_exists_by_email, create_profile_instance, update_profile_password
 )
-from app.services.profile.profile import register_user, widget_url_by_guid, get_accounts
+from app.services.profile.profile import register_user, widget_url_by_guid, get_accounts, get_transactions
 
 
 async def profile_create(
@@ -111,9 +111,10 @@ async def get_widget_url(profile: ProfileRetrieve):
 
 
 async def get_card_analysis(
-        member: Member,
-        profile: ProfileRetrieve
+        user_member_guids: MxUserMemberGuids
 ) -> None:
-    accounts_list = await get_accounts(profile.guid, member.member_guid)
-    # TODO # The same but with transactions by any accounts
+    # TODO # Check is it works
+    accounts_list = await get_accounts(user_member_guids.user_guid, user_member_guids.member_guid)
+    transactions = await get_transactions(user_member_guids.user_guid, accounts_list)
+    # TODO: Implement write data to excel
     pass
