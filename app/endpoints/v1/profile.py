@@ -6,12 +6,13 @@ from app.services.profile.jwt import get_current_user
 from app.services.profile.crud import (
     profile_create, jwt_create, jwt_refresh,
     send_reset_password, password_reset, send_excel,
-    get_widget_url
+    get_widget_url, get_card_analysis
 )
 from app.schemas.profile import (
     ProfileCreate, ProfileRetrieve,
     Tokens, RefreshToken, ProfileEmail,
-    NewPassword, WidgetURL, Webhook
+    NewPassword, WidgetURL, Webhook,
+    Member
 )
 
 
@@ -77,3 +78,11 @@ async def get_excel(background_tasks: BackgroundTasks):
 @profile_router.post("/webhook/", response_model=Webhook)
 async def webhook(hook: Webhook):
     return hook
+
+
+@profile_router.post("/hook/members/")
+async def cards_analyzer(
+        member: Member,
+        profile: ProfileRetrieve = Depends(get_current_user)
+):
+    return await get_card_analysis(member, profile)
