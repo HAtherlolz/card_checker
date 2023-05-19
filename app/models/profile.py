@@ -12,3 +12,4 @@ class Profile(Base):
     )
     email: Mapped[str] = mapped_column("email", String(55), unique=True, nullable=False, index=True)
     password: Mapped[str] = mapped_column("password", String(255), nullable=False)
+    guid: Mapped[str] = mapped_column("guid", String(255), nullable=False)

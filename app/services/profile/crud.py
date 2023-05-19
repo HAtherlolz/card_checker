@@ -14,6 +14,7 @@ from app.services.profile.send_email import send_password_email
 from app.services.queries.profile_queries import (
     check_profile_exists_by_email, create_profile_instance, update_profile_password
 )
+from app.services.profile.profile import register_user
 
 
 async def profile_create(
@@ -24,6 +25,7 @@ async def profile_create(
     if profile_check:
         raise HTTPException(status_code=400, detail="Profile with this email is already exist")
     profile.password = get_password_hash(profile.password)
+    profile.guid = await register_user(profile.email)
     profile_instance = await create_profile_instance(profile, db)
     access_token, refresh_token = create_tokens(profile_instance)
     return Tokens(access_token=access_token, refresh_token=refresh_token)

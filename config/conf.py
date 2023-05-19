@@ -41,6 +41,11 @@ class Settings(BaseSettings):
     ALGORITHM: str = os.getenv("ALGORITHM")
     ACCESS_TOKEN_EXPIRE_MINUTES: int = os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES")
 
+    # MX
+    API_KEY: str = os.getenv("API_KEY")
+    CLIENT_ID: str = os.getenv("CLIENT_ID")
+    MX_API: str = os.getenv("CLIENT_ID")
+
     # Allowed hosts
     BACKEND_CORS_ORIGINS: list = [
         "http://localhost",

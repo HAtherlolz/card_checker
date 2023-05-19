@@ -5,6 +5,7 @@ class ProfileRetrieve(BaseModel):
     """ Retrieve Profile schema """
     id: int
     email: EmailStr
+    guid: str | None
 
     class Config:
         orm_mode = True
@@ -19,6 +20,7 @@ class ProfileCreate(BaseModel):
     """ Create Profile schema """
     email: EmailStr
     password: str
+    guid: str | None
 
 
 class NewPassword(BaseModel):
