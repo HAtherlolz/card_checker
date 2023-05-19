@@ -1,3 +1,5 @@
+from typing import Any
+
 from pydantic import BaseModel, EmailStr
 
 
@@ -33,13 +35,13 @@ class WidgetURL(BaseModel):
 
 
 class Webhook(BaseModel):
-    action: str | None
-    connection_status: str | None
-    connection_status_id: int | None
-    connection_status_message: str | None
-    member_guid: str | None
-    type: str | None
-    user_guid: str | None
+    action: Any | None
+    connection_status: Any | None
+    connection_status_id: Any | None
+    connection_status_message: Any | None
+    member_guid: Any | None
+    type: Any | None
+    user_guid: Any | None
 
 
 class NewPassword(BaseModel):
