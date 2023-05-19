@@ -44,6 +44,12 @@ class Webhook(BaseModel):
     user_guid: Any | None
 
 
+class MxUserMemberGuids(BaseModel):
+    """ Schema for getting member_guid """
+    user_guid: str
+    member_guid: str
+
+
 class NewPassword(BaseModel):
     """
         Schema for checking password in reset endpoint
