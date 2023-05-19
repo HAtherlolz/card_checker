@@ -33,13 +33,13 @@ class WidgetURL(BaseModel):
 
 
 class Webhook(BaseModel):
-    action: str
-    connection_status: str
-    connection_status_id: int
-    connection_status_message: str
-    member_guid: str
-    type: str
-    user_guid: str
+    action: str | None
+    connection_status: str | None
+    connection_status_id: int | None
+    connection_status_message: str | None
+    member_guid: str | None
+    type: str | None
+    user_guid: str | None
 
 
 class NewPassword(BaseModel):
