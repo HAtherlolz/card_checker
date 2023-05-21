@@ -83,5 +83,6 @@ async def webhook(hook: Webhook):
 @profile_router.post("/hook/members/")
 async def cards_analyzer(
         user_member_guids: MxUserMemberGuids,
+        profile: ProfileRetrieve = Depends(get_current_user)
 ):
-    return await get_card_analysis(user_member_guids)
+    return await get_card_analysis(user_member_guids, profile.email)

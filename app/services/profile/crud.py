@@ -6,7 +6,7 @@ from app.models import Profile
 from app.schemas.profile import (
     ProfileCreate, Tokens, RefreshToken,
     ProfileEmail, NewPassword, ProfileCreateWithGUID,
-    ProfileRetrieve, MxUserMemberGuids
+    ProfileRetrieve, MxUserMemberGuids, EmailStr
 )
 from app.services.profile.jwt import (
     get_password_hash, create_tokens, authenticate_user,
@@ -112,6 +112,7 @@ async def get_widget_url(profile: ProfileRetrieve):
 
 async def get_card_analysis(
         user_member_guids: MxUserMemberGuids,
+        to_email: EmailStr
         # background_tasks: BackgroundTasks
 ) -> dict:
     # TODO # Check is it works
@@ -121,7 +122,7 @@ async def get_card_analysis(
     print("==================TRANSACTIONS==============", transactions)
     # TODO: Implement write data to excel
     excel = await get_excel_file(transactions)
-    send_excel_email(email_to="kirill.syusko17@gmail.com", file=excel)
+    send_excel_email(email_to=to_email, file=excel)
     # print("========================================================================================================")
     # for k in transactions:
     #     print("KKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKK", k)
