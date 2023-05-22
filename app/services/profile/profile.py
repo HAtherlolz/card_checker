@@ -78,7 +78,7 @@ async def get_accounts(user_guid: str, member_guid: str) -> list:
         if res["pagination"]["total_pages"] > 1:
             print("SMTHS")
             pages = res["pagination"]["total_pages"]
-            for page in range(1, pages):
+            for page in range(1, pages + 1):
                 url = f"{settings.MX_API}/users/{user_guid}/members/{member_guid}/" \
                       f"accounts?page={page}&records_per_page=100"
                 async with session.get(url=url, headers=headers, auth=auth) as response:
@@ -132,7 +132,7 @@ async def get_transactions(user_guid: str, accounts_list: list) -> dict:
                 print("TUTA")
                 pages = res["pagination"]["total_pages"]
 
-                for page in range(1, pages):
+                for page in range(1, pages + 1):
                     url = f"{settings.MX_API}/users/{user_guid}/accounts/{account_guid}/" \
                           f"transactions?from_date={from_date}&to_date={to_date}&page={page}&records_per_page=100"
                     async with session.get(url=url, headers=headers, auth=auth) as response:
