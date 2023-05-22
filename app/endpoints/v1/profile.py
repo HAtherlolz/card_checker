@@ -5,7 +5,7 @@ from config.database import AsyncSession, get_session
 from app.services.profile.jwt import get_current_user
 from app.services.profile.crud import (
     profile_create, jwt_create, jwt_refresh,
-    send_reset_password, password_reset, send_excel,
+    send_reset_password, password_reset,
     get_widget_url, get_card_analysis
 )
 from app.schemas.profile import (
