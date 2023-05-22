@@ -1,5 +1,7 @@
 import aiohttp
 
+from fastapi import HTTPException, status
+
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
 
@@ -29,7 +31,15 @@ async def register_user(email: EmailStr) -> str:
         auth = aiohttp.BasicAuth(login=settings.CLIENT_ID, password=settings.API_KEY)
         async with session.post(url=url, json=data, headers=settings.MX_HEADERS, auth=auth) as response:
             res = await response.json()
-    return res["user"]["guid"]
+    try:
+        response = res["user"]["guid"]
+    except KeyError:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="User with this email is already exist",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    return response
 
 
 async def widget_url_by_guid(guid: str) -> str:
