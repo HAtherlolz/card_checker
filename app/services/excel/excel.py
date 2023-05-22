@@ -1,16 +1,20 @@
 import io
 
 import openpyxl
+from openpyxl.styles import Font
 
+from fastapi import UploadFile
 from starlette.datastructures import UploadFile as StarletteUploadFile
 
 import tempfile
 
 
-async def get_excel_file(transactions: dict) -> None:
+async def get_excel_file(transactions: dict) -> UploadFile:
     """
         Getting data and creating excel file by them
     """
+
+    # Makes excel by data
     workbook = openpyxl.Workbook()
     sheet_p = 1
     for account in transactions:
@@ -20,6 +24,9 @@ async def get_excel_file(transactions: dict) -> None:
             sheet_p = 0
         else:
             sheet = workbook.create_sheet(title=account)
+        bold_font = Font(bold=True)
+        sheet['A1'].font = bold_font
+        sheet['B1'].font = bold_font
         sheet['A1'] = "Category"
         sheet['B1'] = "Total Spent"
         iteration = 2
@@ -30,18 +37,6 @@ async def get_excel_file(transactions: dict) -> None:
                 sheet[a] = cat
                 sheet[b] = category[cat]
                 iteration += 1
-
-
-    # Create the first sheet and populate it with data
-    # sheet1 = workbook.active
-    # sheet1.title = "Sheet 1"
-    # sheet1['A1'] = "Data 1"
-    # sheet1['B1'] = "Data 2"
-    #
-    # # Create the second sheet and populate it with data
-    # sheet2 = workbook.create_sheet(title="Sheet 2")
-    # sheet2['A1'] = "Data 3"
-    # sheet2['B1'] = "Data 4"
 
     bytes_stream = io.BytesIO()
     workbook.save(bytes_stream)
@@ -56,6 +51,4 @@ async def get_excel_file(transactions: dict) -> None:
 
     f = StarletteUploadFile(file=temp_file, filename=f"{filename}.xls")
 
-    print("==========================", type(temp_file))
-    print("1231231", f)
     return f
