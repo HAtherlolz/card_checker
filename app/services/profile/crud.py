@@ -97,11 +97,6 @@ async def password_reset(
     return await update_profile_password(profile.id, hashed_password, db)
 
 
-async def send_excel(background_tasks: BackgroundTasks) -> None:
-    file = await get_excel_file({})
-    background_tasks.add_task(send_excel_email, email_to="kirill.syusko17@gmail.com", file=file)
-
-
 async def get_widget_url(profile: ProfileRetrieve):
     url = await widget_url_by_guid(profile.guid)
     res = {

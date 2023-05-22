@@ -70,16 +70,6 @@ async def profile_change_password(
     return await password_reset(passwords, db)
 
 
-@profile_router.get("/excel/")
-async def get_excel(background_tasks: BackgroundTasks):
-    return await send_excel(background_tasks)
-
-
-@profile_router.post("/webhook/", response_model=Webhook)
-async def webhook(hook: Webhook):
-    return hook
-
-
 @profile_router.post("/hook/members/")
 async def cards_analyzer(
         user_member_guids: MxUserMemberGuids,
