@@ -57,6 +57,17 @@ class Settings(BaseSettings):
         "http://127.0.0.1:8080",
     ]
 
+    MX_HEADERS: dict = {
+        "Content-Type": "application/json",
+        "Accept": "application/vnd.mx.api.v1+json"
+    }
+
+    MX_WIDGET_SETTINGS: dict = {
+        "widget_url": {
+            "widget_type": "connect_widget",
+            "color_scheme": "dark"
+        }
+    }
 
 settings = Settings()
 
