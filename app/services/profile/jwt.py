@@ -1,6 +1,9 @@
+import pytz
+
 from datetime import timedelta, datetime
 
 from jose import JWTError, jwt
+from jose.exceptions import ExpiredSignatureError
 
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
@@ -58,7 +61,13 @@ async def get_user_instance(token: str, db: AsyncSession):
         if email is None:
             raise credentials_exception
         token_data = TokenData(email=email)
-    except JWTError:
+    except JWTError as e:
+        if isinstance(e, ExpiredSignatureError):
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Token has expired",
+                headers={"WWW-Authenticate": "Bearer"},
+            )
         raise credentials_exception
     user = await check_profile_exists_by_email(token_data.email, db)
     if user is None:
@@ -71,8 +80,10 @@ def create_tokens(profile: Profile) -> tuple:
         "sub": profile.email,
         "user_id": profile.id
     }
-    access_expire = datetime.utcnow() + timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES * 24 * 7)
-    refresh_expire = datetime.utcnow() + timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES * 24 * 30)
+    access_expire = datetime.now(
+        tz=pytz.timezone(settings.TIMEZONE)) + timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES * 24 * 7)
+    refresh_expire = datetime.now(
+        tz=pytz.timezone(settings.TIMEZONE)) + timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES * 24 * 30)
 
     to_encode.update({"exp": access_expire})
     to_encode.update({"token_type": "access"})

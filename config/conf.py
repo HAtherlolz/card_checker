@@ -46,6 +46,9 @@ class Settings(BaseSettings):
     CLIENT_ID: str = os.getenv("CLIENT_ID")
     MX_API: str = os.getenv("CLIENT_ID")
 
+    # Timezone
+    TIMEZONE: str = os.getenv("TIMEZONE")
+
     # Allowed hosts
     BACKEND_CORS_ORIGINS: list = [
         "http://localhost",
