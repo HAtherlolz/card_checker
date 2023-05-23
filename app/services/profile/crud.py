@@ -34,7 +34,7 @@ async def profile_create(
     profile_with_guid = ProfileCreateWithGUID(email=profile.email, password=hashed_password, guid=guid)
 
     profile_instance = await create_profile_instance(profile_with_guid, db)
-    access_token, refresh_token = create_tokens(profile_instance)
+    access_token, refresh_token = await create_tokens(profile_instance)
     return Tokens(access_token=access_token, refresh_token=refresh_token)
 
 
@@ -49,7 +49,7 @@ async def jwt_create(
             detail="Incorrect username or password",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    access_token, refresh_token = create_tokens(profile_instance)
+    access_token, refresh_token = await create_tokens(profile_instance)
     return Tokens(access_token=access_token, refresh_token=refresh_token)
 
 
@@ -64,7 +64,7 @@ async def jwt_refresh(
             detail="Incorrect username or password",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    access_token, refresh_token = create_tokens(profile_instance)
+    access_token, refresh_token = await create_tokens(profile_instance)
     return Tokens(access_token=access_token, refresh_token=refresh_token)
 
 
@@ -76,7 +76,7 @@ async def send_reset_password(
     profile_check = await check_profile_exists_by_email(email.email, db)
     if not profile_check:
         raise HTTPException(status_code=400, detail="Profile with this email does not exist")
-    access_token, _ = create_tokens(profile_check)
+    access_token, _ = await create_tokens(profile_check)
     background_tasks.add_task(send_password_email, email.email, access_token)
     return {"message": "The email for with link to reset password successfully send"}
 

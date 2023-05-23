@@ -75,7 +75,7 @@ async def get_user_instance(token: str, db: AsyncSession):
     return user
 
 
-def create_tokens(profile: Profile) -> tuple:
+async def create_tokens(profile: Profile) -> tuple:
     to_encode = {
         "sub": profile.email,
         "user_id": profile.id
