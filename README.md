@@ -51,6 +51,14 @@
  SECRET_KEY=
  ALGORITHM=
  ACCESS_TOKEN_EXPIRE_MINUTES=
+ 
+# MX
+ API_KEY=
+ CLIENT_ID=
+ MX_API=
+
+# Timizone
+ TIMEZONE=America/New_York
 ```
 
 You must fill the variables given for you by Team-Lead
