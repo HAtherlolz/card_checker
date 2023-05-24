@@ -11,7 +11,7 @@ from app.services.profile.crud import (
 from app.schemas.profile import (
     ProfileCreate, ProfileRetrieve,
     Tokens, RefreshToken, ProfileEmail,
-    NewPassword, WidgetURL, Webhook,
+    NewPassword, WidgetURL,
     MxUserMemberGuids
 )
 

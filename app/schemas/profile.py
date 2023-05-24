@@ -1,6 +1,5 @@
-from typing import Any
-
-from pydantic import BaseModel, EmailStr
+import re
+from pydantic import BaseModel, EmailStr, validator
 
 
 class ProfileRetrieve(BaseModel):
@@ -23,6 +22,13 @@ class ProfileCreate(BaseModel):
     email: EmailStr
     password: str
 
+    @validator("password")
+    def password_validator(cls, v: str) -> str:
+        password_regex = r"^(?=.*[A-Z])(?=.*\d).{8,}$"
+        if not re.match(password_regex, v):
+            raise ValueError("The password must contains at least 8 charset, at least 1 uppercase charset")
+        return v
+
 
 class ProfileCreateWithGUID(ProfileCreate):
     """ Create profile with guid """
@@ -32,16 +38,6 @@ class ProfileCreateWithGUID(ProfileCreate):
 class WidgetURL(BaseModel):
     """ Schema for getting url """
     url: str
-
-
-class Webhook(BaseModel):
-    action: Any | None
-    connection_status: Any | None
-    connection_status_id: Any | None
-    connection_status_message: Any | None
-    member_guid: Any | None
-    type: Any | None
-    user_guid: Any | None
 
 
 class MxUserMemberGuids(BaseModel):
@@ -57,6 +53,13 @@ class NewPassword(BaseModel):
     token: str
     password: str
     new_password: str
+
+    @validator("password")
+    def password_validator(cls, v: str) -> str:
+        password_regex = r"^(?=.*[A-Z])(?=.*\d).{8,}$"
+        if not re.match(password_regex, v):
+            raise ValueError("The password must contains at least 8 charset, at least 1 uppercase charset")
+        return v
 
 
 # ===============Tokens==============
