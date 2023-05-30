@@ -59,6 +59,9 @@
 
 # Timizone
  TIMEZONE=America/New_York
+ 
+# ADMIN EMAIL
+ ADMIN_EMAIL=
 ```
 
 You must fill the variables given for you by Team-Lead
