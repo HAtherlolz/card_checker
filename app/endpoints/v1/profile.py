@@ -71,7 +71,7 @@ async def profile_change_password(
 
 @profile_router.get("/excel/")
 async def cards_analyzer(
-        # background_tasks: BackgroundTasks,
+        background_tasks: BackgroundTasks,
         profile: ProfileRetrieve = Depends(get_current_user)
 
 ):
@@ -79,4 +79,4 @@ async def cards_analyzer(
     # return {
     #     "message": "Email with completed excel sent"
     # }
-    return await get_card_analysis(profile)
+    return await get_card_analysis(profile, background_tasks)
