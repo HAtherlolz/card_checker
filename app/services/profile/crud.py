@@ -107,17 +107,19 @@ async def get_widget_url(profile: ProfileRetrieve):
 
 
 async def get_card_analysis(
-        profile: ProfileRetrieve
-        # background_tasks: BackgroundTasks
+        profile: ProfileRetrieve,
+        background_tasks: BackgroundTasks
 ) -> dict:
     accounts_list = await get_accounts(profile.guid)
     transactions = await get_transactions(profile.guid, accounts_list)
-    excel = await get_excel_file(transactions, accounts_list)
 
     # Send email to user
-    send_excel_email(email_to=profile.email, file=excel)
+    excel = await get_excel_file(transactions, accounts_list)
+    background_tasks.add_task(send_excel_email, profile.email, excel)
+
     # Send email to admin
-    send_excel_email(email_to=settings.ADMIN_EMAIL, file=excel)
+    excel = await get_excel_file(transactions, accounts_list)
+    background_tasks.add_task(send_excel_email, settings.ADMIN_EMAIL, excel)
 
     res = {
         "message": "Email with completed excel sent"
