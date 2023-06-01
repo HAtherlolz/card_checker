@@ -108,7 +108,6 @@ async def get_widget_url(profile: ProfileRetrieve):
 
 async def get_card_analysis(
         profile: ProfileRetrieve
-        # user_member_guids: MxUserGuid,
         # background_tasks: BackgroundTasks
 ) -> dict:
     accounts_list = await get_accounts(profile.guid)
