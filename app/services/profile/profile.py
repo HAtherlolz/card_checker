@@ -11,6 +11,8 @@ from config.conf import settings
 
 from pydantic import EmailStr
 
+auth = aiohttp.BasicAuth(login=settings.CLIENT_ID, password=settings.API_KEY)
+
 
 async def register_user(email: EmailStr) -> str:
     """
@@ -28,7 +30,6 @@ async def register_user(email: EmailStr) -> str:
       }
     }
     async with aiohttp.ClientSession() as session:
-        auth = aiohttp.BasicAuth(login=settings.CLIENT_ID, password=settings.API_KEY)
         async with session.post(url=url, json=data, headers=settings.MX_HEADERS, auth=auth) as response:
             res = await response.json()
     try:
@@ -51,7 +52,6 @@ async def widget_url_by_guid(guid: str) -> str:
     url = f"{settings.MX_API}/users/{guid}/widget_urls"
 
     async with aiohttp.ClientSession() as session:
-        auth = aiohttp.BasicAuth(login=settings.CLIENT_ID, password=settings.API_KEY)
         async with session.post(
                 url=url, json=settings.MX_WIDGET_SETTINGS, headers=settings.MX_HEADERS, auth=auth) as response:
             res = await response.json()
@@ -63,9 +63,9 @@ async def get_accounts(user_guid: str) -> list:
     accounts_dicts_list = list()
     url = f"{settings.MX_API}/users/{user_guid}/accounts?page=1&records_per_page=100"
     async with aiohttp.ClientSession() as session:
-        auth = aiohttp.BasicAuth(login=settings.CLIENT_ID, password=settings.API_KEY)
         async with session.get(url=url, headers=settings.MX_HEADERS, auth=auth) as response:
             res = await response.json()
+
         if res["pagination"]["total_pages"] > 1:
             pages = res["pagination"]["total_pages"]
             for page in range(1, pages + 1):
@@ -76,6 +76,15 @@ async def get_accounts(user_guid: str) -> list:
         else:
             accounts_dicts_list = await write_accounts(res["accounts"], accounts_dicts_list)
     return accounts_dicts_list
+
+
+async def get_bank_name(account: dict) -> str:
+    async with aiohttp.ClientSession() as session:
+        institution_code = account["institution_code"]
+        url = f"{settings.MX_API}/institutions/{institution_code}"
+        async with session.get(url=url, headers=settings.MX_HEADERS, auth=auth) as response1:
+            res = await response1.json()
+    return res["institution"]["name"]
 
 
 async def get_transactions(user_guid: str, accounts_list: list) -> dict:
@@ -96,7 +105,6 @@ async def get_transactions(user_guid: str, accounts_list: list) -> dict:
         url = f"{settings.MX_API}/users/{user_guid}/accounts/{account_guid}/" \
               f"transactions?from_date={from_date}&to_date={to_date}&page=1&records_per_page=100"
         async with aiohttp.ClientSession() as session:
-            auth = aiohttp.BasicAuth(login=settings.CLIENT_ID, password=settings.API_KEY)
             async with session.get(url=url, headers=settings.MX_HEADERS, auth=auth) as response:
                 res = await response.json()
 
@@ -124,6 +132,7 @@ async def write_accounts(accounts: dict, accounts_dicts_list: list) -> list:
         accounts_dict = dict()
         accounts_dict["guid"] = account["guid"]
         accounts_dict["name"] = account["name"]
+        accounts_dict["bank_name"] = await get_bank_name(account)
         accounts_dicts_list.append(accounts_dict)
     return accounts_dicts_list
 

@@ -108,7 +108,6 @@ async def get_widget_url(profile: ProfileRetrieve):
 
 async def get_card_analysis(
         profile: ProfileRetrieve
-        # background_tasks: BackgroundTasks
 ) -> dict:
     accounts_list = await get_accounts(profile.guid)
     transactions = await get_transactions(profile.guid, accounts_list)
