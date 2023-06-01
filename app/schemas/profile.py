@@ -40,10 +40,9 @@ class WidgetURL(BaseModel):
     url: str
 
 
-class MxUserMemberGuids(BaseModel):
+class MxUserGuid(BaseModel):
     """ Schema for getting member_guid """
     user_guid: str
-    member_guid: str
 
 
 class NewPassword(BaseModel):

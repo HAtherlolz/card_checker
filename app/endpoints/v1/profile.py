@@ -12,7 +12,7 @@ from app.schemas.profile import (
     ProfileCreate, ProfileRetrieve,
     Tokens, RefreshToken, ProfileEmail,
     NewPassword, WidgetURL,
-    MxUserMemberGuids
+    MxUserGuid
 )
 
 
@@ -70,9 +70,8 @@ async def profile_change_password(
     return await password_reset(passwords, db)
 
 
-@profile_router.post("/hook/members/")
+@profile_router.get("/excel/")
 async def cards_analyzer(
-        user_member_guids: MxUserMemberGuids,
         profile: ProfileRetrieve = Depends(get_current_user)
 ):
-    return await get_card_analysis(user_member_guids, profile.email)
+    return await get_card_analysis(profile)
