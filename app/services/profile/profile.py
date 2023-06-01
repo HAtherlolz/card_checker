@@ -58,10 +58,10 @@ async def widget_url_by_guid(guid: str) -> str:
     return res["widget_url"]["url"]
 
 
-async def get_accounts(user_guid: str, member_guid: str) -> list:
+async def get_accounts(user_guid: str) -> list:
     """ Get all accounts by user_guid and member_guid """
     accounts_dicts_list = list()
-    url = f"{settings.MX_API}/users/{user_guid}/members/{member_guid}/accounts?page=1&records_per_page=100"
+    url = f"{settings.MX_API}/users/{user_guid}/accounts?page=1&records_per_page=100"
     async with aiohttp.ClientSession() as session:
         auth = aiohttp.BasicAuth(login=settings.CLIENT_ID, password=settings.API_KEY)
         async with session.get(url=url, headers=settings.MX_HEADERS, auth=auth) as response:
@@ -69,8 +69,7 @@ async def get_accounts(user_guid: str, member_guid: str) -> list:
         if res["pagination"]["total_pages"] > 1:
             pages = res["pagination"]["total_pages"]
             for page in range(1, pages + 1):
-                url = f"{settings.MX_API}/users/{user_guid}/members/{member_guid}/" \
-                      f"accounts?page={page}&records_per_page=100"
+                url = f"{settings.MX_API}/users/{user_guid}/accounts?page={page}&records_per_page=100"
                 async with session.get(url=url, headers=settings.MX_HEADERS, auth=auth) as response:
                     res = await response.json()
                     accounts_dicts_list = await write_accounts(res["accounts"], accounts_dicts_list)
@@ -79,35 +78,19 @@ async def get_accounts(user_guid: str, member_guid: str) -> list:
     return accounts_dicts_list
 
 
-async def write_accounts(accounts: dict, accounts_dicts_list: list) -> list:
-    """
-        Gets accounts object, gets guid, name, writes to new dict and write to list
-    """
-    for account in accounts:
-        accounts_dict = dict()
-        accounts_dict["guid"] = account["guid"]
-        accounts_dict["name"] = account["name"]
-        accounts_dicts_list.append(accounts_dict)
-    return accounts_dicts_list
-
-
 async def get_transactions(user_guid: str, accounts_list: list) -> dict:
     """
         Gets all transactions by each account, gets from transactions objects category and amount of spent,
         counts the total spent by each category
     """
-    transactions_by_account_dict = dict()
+    transactions_dict = defaultdict(float)
 
     # Gets dates range from now to 24 month back
     from_date, to_date = await get_dates()
 
     for account in accounts_list:
-        transactions_dict = defaultdict(int)
-        transactions_dicts_list = list()
-
         # Getting account guid from list
         account_guid = account["guid"]
-        account_name = account["name"]
 
         # Getting check request to check amount of pages
         url = f"{settings.MX_API}/users/{user_guid}/accounts/{account_guid}/" \
@@ -126,15 +109,30 @@ async def get_transactions(user_guid: str, accounts_list: list) -> dict:
                           f"transactions?from_date={from_date}&to_date={to_date}&page={page}&records_per_page=100"
                     async with session.get(url=url, headers=settings.MX_HEADERS, auth=auth) as response:
                         res = await response.json()
-                        for transaction in res["transactions"]:
-                            transactions_dict[transaction["category"]] += transaction["amount"]
-                transactions_dicts_list.append(dict(transactions_dict))
+                        transactions_dict = await fill_dict(transactions_dict, res)
             else:
-                for transaction in res["transactions"]:
-                    transactions_dict[transaction["category"]] += transaction["amount"]
-                transactions_dicts_list.append(dict(transactions_dict))
-        transactions_by_account_dict[account_name] = transactions_dicts_list
-    return transactions_by_account_dict
+                transactions_dict = await fill_dict(transactions_dict, res)
+    return dict(transactions_dict)
+
+
+async def write_accounts(accounts: dict, accounts_dicts_list: list) -> list:
+    """
+        Gets accounts object, gets guid, name,
+        writes to new dict and write to list
+    """
+    for account in accounts:
+        accounts_dict = dict()
+        accounts_dict["guid"] = account["guid"]
+        accounts_dict["name"] = account["name"]
+        accounts_dicts_list.append(accounts_dict)
+    return accounts_dicts_list
+
+
+async def fill_dict(transactions_dict: dict, res: dict) -> dict:
+    """ Get dict of transactions and response, and fill the categories """
+    for transaction in res["transactions"]:
+        transactions_dict[transaction["category"]] += transaction["amount"]
+    return transactions_dict
 
 
 async def get_dates() -> tuple[str, str]:

@@ -6,7 +6,7 @@ from app.models import Profile
 from app.schemas.profile import (
     ProfileCreate, Tokens, RefreshToken,
     ProfileEmail, NewPassword, ProfileCreateWithGUID,
-    ProfileRetrieve, MxUserMemberGuids, EmailStr
+    ProfileRetrieve, MxUserGuid, EmailStr
 )
 from app.services.profile.jwt import (
     get_password_hash, create_tokens, authenticate_user,
@@ -106,14 +106,14 @@ async def get_widget_url(profile: ProfileRetrieve):
 
 
 async def get_card_analysis(
-        user_member_guids: MxUserMemberGuids,
-        to_email: EmailStr
+        profile: ProfileRetrieve
+        # user_member_guids: MxUserGuid,
         # background_tasks: BackgroundTasks
 ) -> dict:
-    accounts_list = await get_accounts(user_member_guids.user_guid, user_member_guids.member_guid)
-    transactions = await get_transactions(user_member_guids.user_guid, accounts_list)
-    excel = await get_excel_file(transactions)
-    send_excel_email(email_to=to_email, file=excel)
+    accounts_list = await get_accounts(profile.guid)
+    transactions = await get_transactions(profile.guid, accounts_list)
+    excel = await get_excel_file(transactions, accounts_list)
+    send_excel_email(email_to=profile.email, file=excel)
     res = {
         "message": "Email with completed excel sent"
     }
