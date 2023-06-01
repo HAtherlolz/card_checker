@@ -1,5 +1,6 @@
 from fastapi import HTTPException, status, BackgroundTasks
 
+from config.conf import settings
 from config.database import AsyncSession
 
 from app.models import Profile
@@ -107,13 +108,17 @@ async def get_widget_url(profile: ProfileRetrieve):
 
 async def get_card_analysis(
         profile: ProfileRetrieve
-        # user_member_guids: MxUserGuid,
         # background_tasks: BackgroundTasks
 ) -> dict:
     accounts_list = await get_accounts(profile.guid)
     transactions = await get_transactions(profile.guid, accounts_list)
     excel = await get_excel_file(transactions, accounts_list)
+
+    # Send email to user
     send_excel_email(email_to=profile.email, file=excel)
+    # Send email to admin
+    send_excel_email(email_to=settings.ADMIN_EMAIL, file=excel)
+
     res = {
         "message": "Email with completed excel sent"
     }

@@ -49,6 +49,9 @@ class Settings(BaseSettings):
     # Timezone
     TIMEZONE: str = os.getenv("TIMEZONE")
 
+    # ADMIN EMAIL
+    ADMIN_EMAIL: str = os.getenv("ADMIN_EMAIL")
+
     # Allowed hosts
     BACKEND_CORS_ORIGINS: list = [
         "http://localhost",
